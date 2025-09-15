@@ -16,7 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from gestionInterna import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home),
+    path('createpedido/', views.createpedido, name='createpedido'),
+    path('detalle_pedido/<int:pedido_id>/', views.detalle_pedido, name='detalle_pedido'),
+    path('create_tarea/<int:pedido_id>/', views.create_tarea, name='create_tarea'),
+
 ]
+

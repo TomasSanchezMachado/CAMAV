@@ -8,13 +8,12 @@ class Cliente(models.Model):
   telefono = models.CharField(max_length=20)
   correo = models.CharField(max_length=100)
 
-
 class Pedido(models.Model):
   fechaingreso = models.DateField(auto_now_add=True)
   horaingreso = models.TimeField(auto_now_add=True)
   estado = models.CharField(max_length=100)
-  fechaSalidaEstimada = models.DateField()
-  fechaSalidaReal = models.DateField(blank=True)
+  fechaSalidaEstimada = models.DateField(blank=True, null=True)
+  fechaSalidaReal = models.DateField(blank=True, null=True)
   cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
 
 class Operario(models.Model):
@@ -33,24 +32,16 @@ class Amortiguador(models.Model):
   nroSerieamortiguador= models.BigIntegerField()
   tipo = models.CharField(max_length=100)
   fichaamortiguador = models.ForeignKey(Fichaamortiguador, on_delete=models.CASCADE)
-  configuracion = models.TextField(blank=True)
+  configuracion = models.CharField(max_length=100, default='Sin configurar')
 
-class EstadoTarea(models.TextChoices):
-    PENDIENTE = 'pendiente', 'Pendiente'
-    EN_PROGRESO = 'en_progreso', 'En progreso'
-    COMPLETADA = 'completada', 'Completada'
 
 class Tarea(models.Model):
   pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-  estado = estado = models.CharField(
-        max_length=20,
-        choices=EstadoTarea.choices,
-        default=EstadoTarea.PENDIENTE
-    )
+  estado = models.CharField(max_length=20)
   prioridad = models.CharField(max_length=20)
   fechaAsignacion = models.DateField(auto_now_add=True)
-  fechaLimite = models.DateField()
-  tipoTarea = models.CharField(max_length=100, blank=True)
+  fechaLimite = models.DateField(blank=True, null=True)
+  tipoTarea = models.CharField(max_length=100, blank=True, null=True)
   operario = models.ForeignKey(Operario, on_delete=models.CASCADE)
   amortiguador = models.ForeignKey(Amortiguador, on_delete=models.CASCADE)
 
@@ -60,19 +51,19 @@ class Observacion (models.Model):
   fechaobservacion= models.DateField(auto_now_add=True)
   horaobservacion = models.TimeField(auto_now_add=True)
   tipoobservacion = models.CharField(max_length=100)
-  infoobservacion = models.TextField(blank = True)
+  infoobservacion = models.TextField(blank = True, null = True)
 
 class Material(models.Model):
   tipo = models.CharField(max_length=100)
   stockActual = models.BigIntegerField()
   stockMinimo = models.BigIntegerField()
-  stockreservado = models.BigIntegerField()
+  stockreservado = models.BigIntegerField(blank=True, null=True)
 
 class MaterialTarea(models.Model):
   material = models.ForeignKey(Material, on_delete=models.CASCADE)
   tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE)
   stockrecomendado = models.BigIntegerField()
-  stockusado = models.BigIntegerField()
+  stockusado = models.BigIntegerField(blank=True, null=True)
 
 class Proveedor(models.Model):
   nombre = models.CharField(max_length=200)
