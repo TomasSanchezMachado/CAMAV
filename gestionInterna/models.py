@@ -52,12 +52,20 @@ class Observacion (models.Model):
   horaobservacion = models.TimeField(auto_now_add=True)
   tipoobservacion = models.CharField(max_length=100)
   infoobservacion = models.TextField(blank = True, null = True)
+  valordiagrama = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
 
 class Material(models.Model):
   tipo = models.CharField(max_length=100)
   stockActual = models.BigIntegerField()
   stockMinimo = models.BigIntegerField()
   stockreservado = models.BigIntegerField(blank=True, null=True)
+
+class MaterialFichaAmortiguador(models.Model):
+  material = models.ForeignKey(Material, on_delete=models.CASCADE)
+  fichaamortiguador = models.ForeignKey(Fichaamortiguador, on_delete=models.CASCADE)
+  cantidadrecomendada = models.BigIntegerField()
+
 
 class MaterialTarea(models.Model):
   material = models.ForeignKey(Material, on_delete=models.CASCADE)

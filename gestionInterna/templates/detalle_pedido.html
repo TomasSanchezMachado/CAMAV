@@ -25,6 +25,18 @@
               <strong>legajo:</strong> {{tarea.operario.legajo }}
             </p>
           </div>
+          {% if pedido.estado == 'revisado' %}
+          <div class="d-flex gap-2">
+            <a
+              href="/historial_amortiguador/{{ tarea.amortiguador.id }}/"
+              class="btn btn-primary"
+              >ver historial_amortiguador</a
+            >
+            <a href="/detalle_tarea/{{ tarea.id }}/" class="btn btn-secondary"
+              >Revisar Tarea</a
+            >
+          </div>
+          {% endif %}
         </div>
       </div>
       {% empty %}
