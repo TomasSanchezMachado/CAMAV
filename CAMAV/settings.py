@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'camav.urls'
+ROOT_URLCONF = 'CAMAV.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'camav.wsgi.application'
+WSGI_APPLICATION = 'CAMAV.wsgi.application'
 
 
 # Database
@@ -83,6 +83,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
 
 
 # Password validation
