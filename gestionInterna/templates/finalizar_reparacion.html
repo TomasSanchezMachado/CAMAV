@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Finalizar reparación de tarea #{{ tarea.id }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="orden_trabajo" class="form-label">Orden de trabajo</label>
+      <input type="text" class="form-control" id="orden_trabajo" name="orden_trabajo" required>
+    </div>
+    <div class="mb-3">
+      <label for="observacion" class="form-label">Observaciones</label>
+      <textarea class="form-control" id="observacion" name="observacion" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Listo para despachar</button>
+    <a href="{% url 'tareas_en_reparacion' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+  {% if mensaje %}
+    <div class="alert alert-info mt-3">{{ mensaje }}</div>
+  {% endif %}
+</div>
+{% endblock %}

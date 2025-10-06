@@ -29,5 +29,7 @@ urlpatterns = [
     path('create_observacion/<int:tarea_id>/', views.create_observacion, name='create_observacion'),
     path('listapedidosrevisados/', views.listapedidosrevisados, name='listapedidosrevisados'),
     path('historial_amortiguador/<int:amortiguador_id>/', views.historial_amortiguador, name='historial_amortiguador'),
+    path('tareas_en_reparacion/', views.tareas_en_reparacion, name='tareas_en_reparacion'),
+    path('finalizar_reparacion/<int:tarea_id>/', views.finalizar_reparacion, name='finalizar_reparacion'),
 ]
 

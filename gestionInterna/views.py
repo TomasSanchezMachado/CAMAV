@@ -1,3 +1,4 @@
+from django.urls import reverse
 import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
@@ -277,3 +278,48 @@ def historial_amortiguador(request, tarea_id):
     observaciones = Observacion.objects.filter(amortiguador=amortiguador).order_by('-fechaobservacion', '-horaobservacion')
     return render(request, 'historial_amortiguador.html', {'amortiguador': amortiguador, 'observaciones': observaciones, 'id_pedido': tarea.pedido.id})
 
+## CUU 1.5 ##
+def tareas_en_reparacion(request):
+    # Filtrar tareas en reparación, opcionalmente por operario si hay login
+    tareas = Tarea.objects.filter(estado='en reparacion')
+    context = {'tareas': tareas}
+    return render(request, 'tareas_en_reparacion.html', context)
+
+## CUU 1.5 ##
+def finalizar_reparacion(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    mensaje = None
+    if request.method == 'POST':
+        orden_trabajo = request.POST.get('orden_trabajo')
+        observacion = request.POST.get('observacion')
+        # Registrar observación
+        Observacion.objects.create(
+            tarea=tarea,
+            amortiguador=tarea.amortiguador,
+            tipoobservacion='fin reparacion',
+            infoobservacion=observacion,
+            fechaobservacion=datetime.date.today(),
+            horaobservacion=datetime.datetime.now().time(),
+        )
+        # Cambiar estado de la tarea
+        tarea.estado = 'terminada'
+        tarea.save()
+        # Notificar al encargado (crear notificación)
+        Notificacion.objects.create(
+            tarea=tarea,
+            materiales=f"Finalización: Tarea {tarea.id} finalizada. Orden de trabajo: {orden_trabajo}",
+            resolved=False
+        )
+        # Validar si todas las tareas del pedido están terminadas
+        pedido = tarea.pedido
+        tareas_pedido = Tarea.objects.filter(pedido=pedido)
+        if all(t.estado == 'terminada' for t in tareas_pedido):
+            pedido.estado = 'terminado'
+            pedido.save()
+            Notificacion.objects.create(
+                tarea=None,
+                materiales=f"Finalización: Pedido {pedido.id} finalizado. Todas las tareas terminadas.",
+                resolved=False
+            )
+        return redirect('tareas_en_reparacion')
+    return render(request, 'finalizar_reparacion.html', {'tarea': tarea, 'mensaje': mensaje})

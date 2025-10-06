@@ -90,7 +90,7 @@ class Notificacion(models.Model):
   """Notificación creada cuando una tarea no puede iniciarse por falta de stock.
   Guardamos la lista de materiales (JSON) y la fecha de solicitud.
   """
-  tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE)
+  tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, null=True, blank=True) # Tarea puede ser null si la tarea fue eliminada
   materiales = models.TextField(help_text='JSON list of missing materials with required/available')
   fecha_solicitud = models.DateTimeField(auto_now_add=True)
   resolved = models.BooleanField(default=False)

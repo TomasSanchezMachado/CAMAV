@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'CAMAV.urls'
+ROOT_URLCONF = 'camav.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'CAMAV.wsgi.application'
+WSGI_APPLICATION = 'camav.wsgi.application'
 
 
 # Database
@@ -77,8 +77,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'camav',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'usuario',
+        'PASSWORD': 'contrasena',
         'HOST': 'localhost',
         'PORT': '3306',
     }
