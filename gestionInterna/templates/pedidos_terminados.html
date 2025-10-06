@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2>Pedidos Terminados</h2>
+  <table class="table table-bordered table-hover mt-3">
+    <thead class="table-primary">
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Fecha Ingreso</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pedido in pedidos %}
+      <tr>
+        <td>{{ pedido.id }}</td>
+        <td>{{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}</td>
+        <td>{{ pedido.fechaingreso }}</td>
+        <td>{{ pedido.estado }}</td>
+        <td>
+          <a href="{% url 'emitir_comprobante' pedido.id %}" class="btn btn-success btn-sm">Emitir comprobante</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No hay pedidos terminados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
