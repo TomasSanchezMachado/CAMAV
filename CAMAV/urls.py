@@ -21,6 +21,7 @@ from gestionInterna import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('login/', views.login_view, name='login'),
     path('createpedido/', views.createpedido, name='createpedido'),
     path('detalle_pedido/<int:pedido_id>/', views.detalle_pedido, name='detalle_pedido'),
     path('create_tarea/<int:pedido_id>/', views.create_tarea, name='create_tarea'),
@@ -31,5 +32,7 @@ urlpatterns = [
     path('historial_amortiguador/<int:amortiguador_id>/', views.historial_amortiguador, name='historial_amortiguador'),
     path('tareas_en_reparacion/', views.tareas_en_reparacion, name='tareas_en_reparacion'),
     path('finalizar_reparacion/<int:tarea_id>/', views.finalizar_reparacion, name='finalizar_reparacion'),
+    path('pedidos_terminados/', views.pedidos_terminados, name='pedidos_terminados'),
+    path('emitir_comprobante/<int:pedido_id>/', views.emitir_comprobante, name='emitir_comprobante'),
 ]
 

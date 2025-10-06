@@ -1,9 +1,28 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 from django.urls import reverse
 import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-
 from .models import Cliente , Pedido, Operario, Amortiguador, Fichaamortiguador, Tarea, Observacion, Material, MaterialFichaAmortiguador, MaterialTarea, Notificacion
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+    return render(request, 'login.html')
+
 def home(request):
     return render(request, 'home.html')
 
@@ -323,3 +342,70 @@ def finalizar_reparacion(request, tarea_id):
             )
         return redirect('tareas_en_reparacion')
     return render(request, 'finalizar_reparacion.html', {'tarea': tarea, 'mensaje': mensaje})
+
+## CUU 1.6 ##
+def pedidos_terminados(request):
+    pedidos = Pedido.objects.filter(estado='terminado')
+    return render(request, 'pedidos_terminados.html', {'pedidos': pedidos})
+
+## CUU 1.6 ##
+def emitir_comprobante(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    tareas = Tarea.objects.filter(pedido=pedido)
+    mensaje = None
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        if accion == 'emitir':
+            # Generar PDF con reportlab
+            buffer = io.BytesIO()
+            p = canvas.Canvas(buffer)
+            p.setFont("Helvetica-Bold", 16)
+            p.drawString(100, 800, f"Comprobante de Pedido #{pedido.id}")
+            p.setFont("Helvetica", 12)
+            p.drawString(100, 780, f"Cliente: {pedido.cliente.nombre} {pedido.cliente.apellido}")
+            p.drawString(100, 760, f"DNI: {pedido.cliente.dni}")
+            p.drawString(100, 740, f"Fecha ingreso: {pedido.fechaingreso}")
+            p.drawString(100, 720, f"Estado: {pedido.estado}")
+            y = 700
+            p.drawString(100, y, "Tareas:")
+            for tarea in tareas:
+                y -= 20
+                p.drawString(120, y, f"Amortiguador: {tarea.amortiguador.nroSerieamortiguador} - Estado: {tarea.estado} - Operario: {tarea.operario.nombre} {tarea.operario.apellido}")
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            # Cambiar estado del pedido
+            pedido.estado = 'listo para retirar'
+            pedido.save()
+            return FileResponse(buffer, as_attachment=True, filename=f'comprobante_pedido_{pedido.id}.pdf')
+        elif accion == 'enviar':
+            # Generar PDF
+            buffer = io.BytesIO()
+            p = canvas.Canvas(buffer)
+            p.setFont("Helvetica-Bold", 16)
+            p.drawString(100, 800, f"Comprobante de Pedido #{pedido.id}")
+            p.setFont("Helvetica", 12)
+            p.drawString(100, 780, f"Cliente: {pedido.cliente.nombre} {pedido.cliente.apellido}")
+            p.drawString(100, 760, f"DNI: {pedido.cliente.dni}")
+            p.drawString(100, 740, f"Fecha ingreso: {pedido.fechaingreso}")
+            p.drawString(100, 720, f"Estado: {pedido.estado}")
+            y = 700
+            p.drawString(100, y, "Tareas:")
+            for tarea in tareas:
+                y -= 20
+                p.drawString(120, y, f"Amortiguador: {tarea.amortiguador.nroSerieamortiguador} - Estado: {tarea.estado} - Operario: {tarea.operario.nombre} {tarea.operario.apellido}")
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            # Enviar por email
+            email = EmailMessage(
+                subject=f'Comprobante de Pedido #{pedido.id}',
+                body='Adjunto comprobante de su pedido. Puede retirar el producto.',
+                to=[pedido.cliente.correo]
+            )
+            email.attach(f'comprobante_pedido_{pedido.id}.pdf', buffer.getvalue(), 'application/pdf')
+            email.send()
+            pedido.estado = 'listo para retirar'
+            pedido.save()
+            mensaje = 'Comprobante enviado al cliente.'
+    return render(request, 'comprobante_pedido.html', {'pedido': pedido, 'tareas': tareas, 'mensaje': mensaje})

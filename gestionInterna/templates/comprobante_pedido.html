@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2>Comprobante de Pedido #{{ pedido.id }}</h2>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Cliente</h5>
+      <p class="card-text">{{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}<br>
+        DNI: {{ pedido.cliente.dni }}<br>
+        Teléfono: {{ pedido.cliente.telefono }}<br>
+        Correo: {{ pedido.cliente.correo }}</p>
+      <hr>
+      <h5 class="card-title">Datos del Pedido</h5>
+      <p class="card-text">Fecha de ingreso: {{ pedido.fechaingreso }}<br>
+        Estado: {{ pedido.estado }}</p>
+      <hr>
+      <h5 class="card-title">Tareas</h5>
+      <ul>
+        {% for tarea in tareas %}
+        <li>
+          Amortiguador: {{ tarea.amortiguador.nroSerieamortiguador }} - Estado: {{ tarea.estado }} - Operario: {{ tarea.operario.nombre }} {{ tarea.operario.apellido }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="accion" value="emitir" class="btn btn-success">Emitir comprobante PDF</button>
+    <button type="submit" name="accion" value="enviar" class="btn btn-primary">Enviar comprobante al cliente</button>
+  </form>
+  {% if mensaje %}
+    <div class="alert alert-info mt-3">{{ mensaje }}</div>
+  {% endif %}
+</div>
+{% endblock %}
