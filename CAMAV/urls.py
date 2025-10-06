@@ -31,5 +31,6 @@ urlpatterns = [
     path('historial_amortiguador/<int:amortiguador_id>/', views.historial_amortiguador, name='historial_amortiguador'),
     path('tareas_en_reparacion/', views.tareas_en_reparacion, name='tareas_en_reparacion'),
     path('finalizar_reparacion/<int:tarea_id>/', views.finalizar_reparacion, name='finalizar_reparacion'),
+    path('estado_operarios/', views.lista_operarios, name='estado_operarios'),
 ]
 

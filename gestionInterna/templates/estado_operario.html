@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-3">Estado de operarios</h1>
+
+  {% if operarios %}
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle">
+        <thead>
+          <tr>
+            <td>Legajo</td>
+            <td>Nombre</td>
+            <td>Apellido</td>
+            <td>Tareas pendientes</td>
+            <td>Estado</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for op in operarios %}
+            <tr>
+              <td>{{ op.legajo }}</td>
+              <td>{{ op.nombre }}</td>
+              <td>{{ op.apellido }}</td>
+              <td>{{ op.pendientes_count }}</td>
+              <td>{{ op.estado }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>  
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      No hay operarios para mostrar.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

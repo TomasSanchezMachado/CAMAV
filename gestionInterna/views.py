@@ -1,6 +1,7 @@
 from django.urls import reverse
 import datetime
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count
 from django.http import HttpResponse
 
 from .models import Cliente , Pedido, Operario, Amortiguador, Fichaamortiguador, Tarea, Observacion, Material, MaterialFichaAmortiguador, MaterialTarea, Notificacion
@@ -323,3 +324,24 @@ def finalizar_reparacion(request, tarea_id):
             )
         return redirect('tareas_en_reparacion')
     return render(request, 'finalizar_reparacion.html', {'tarea': tarea, 'mensaje': mensaje})
+
+
+def lista_operarios(request):
+    for op in Operario.objects.all():
+        tarea = (
+            Tarea.objects.filter(operario=op, estado__iexact="en reparacion").order_by('-pk').only('pk').first()
+        )
+        op.estado = str("realizado Tarea: ", tarea.pk) if tarea else "Libre"
+        op.save(update_fields=['estado'])
+
+    pendientes_qs = (
+    Tarea.objects.filter(estado__iexact="pendiente").values('operario_id').annotate(c=Count('id'))
+    )
+    pendientes_map = {row['operario_id']: row['c'] for row in pendientes_qs}
+
+    operarios = list(Operario.objects.all().values())
+    for o in operarios:
+        o.pop('password', None)
+        o['pendientes_count'] = pendientes_map.get(o['id'], 0)
+
+    return render(request, 'estado_operario.html', {'operarios': operarios})
