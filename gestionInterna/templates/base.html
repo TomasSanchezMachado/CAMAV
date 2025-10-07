@@ -18,34 +18,51 @@
   <body>
     {% if request.path != '/login/' %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid d-flex justify-content-between ">
+      <div class="container-fluid d-flex justify-content-between">
         <a class="navbar-brand" href="/">🛠️ Camav</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCamav" aria-controls="navbarCamav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse " id="navbarCamav">
+
+        <div class="collapse navbar-collapse" id="navbarCamav">
           <ul class="navbar-nav ms-auto d-flex gap-3">
+
             <li class="nav-item">
-              <a class="nav-link active" href="/">Inicio</a>
+              <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Inicio</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/createpedido">Crear pedido</a>
+              <a class="nav-link {% if '/createpedido' in request.path %}active{% endif %}" href="/createpedido">Crear pedido</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/paneltareas">Panel de tareas</a>
+              <a class="nav-link {% if '/paneltareas' in request.path %}active{% endif %}" href="/paneltareas">Panel de tareas</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/tareas_en_reparacion">Tareas en reparación</a>
+              <a class="nav-link {% if '/tareas_en_reparacion' in request.path %}active{% endif %}" href="/tareas_en_reparacion">Tareas en reparación</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/estado_operarios">Tareas en reparación</a>
+              <a class="nav-link {% if '/estado_operarios' in request.path %}active{% endif %}" href="/estado_operarios">Estado de operarios</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/pedidos_terminados">Pedidos terminados</a>
+              <a class="nav-link {% if '/pedidos_terminados' in request.path %}active{% endif %}" href="/pedidos_terminados">Pedidos terminados</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/listapedidosrevisados">Pedidos revisados</a>
+              <a class="nav-link {% if '/listapedidosrevisados' in request.path %}active{% endif %}" href="/listapedidosrevisados">Pedidos revisados</a>
             </li>
+
+            <li class="nav-item">
+              <a class="nav-link {% if '/materiales' in request.path %}active{% endif %}" href="/materiales">Materiales</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link {% if '/pedidos/cerrar' in request.path %}active{% endif %}" href="/pedidos/cerrar/">Cerrar pedido</a>
+            </li>
+
           </ul>
         </div>
       </div>

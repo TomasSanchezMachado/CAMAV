@@ -35,5 +35,16 @@ urlpatterns = [
     path('estado_operarios/', views.lista_operarios, name='estado_operarios'),
     path('pedidos_terminados/', views.pedidos_terminados, name='pedidos_terminados'),
     path('emitir_comprobante/<int:pedido_id>/', views.emitir_comprobante, name='emitir_comprobante'),
+    #MATERIALES
+    path('materiales/', views.materiales_list, name='material_list'),
+    path('material/<int:pk>/', views.material_detail, name='material_detail'),
+    path('material/new/', views.material_create, name='material_create'),
+    path('material/<int:pk>/edit/', views.material_update, name='material_update'),
+    path('material/<int:pk>/delete/', views.material_delete, name='material_delete'),
+    path('material/<int:pk>/stock/', views.stock_update, name='stock_update'),
+    path('material/<int:pk>/movimientos/', views.movimientos_list, name='movimientos_list'),
+    ##PEDIDOS
+    path('pedidos/cerrar/', views.buscar_pedido_por_dni, name='buscar_pedido_por_dni'),
+    path('pedidos/<int:pk>/cerrar/', views.cerrar_pedido, name='cerrar_pedido'),
 ]
 

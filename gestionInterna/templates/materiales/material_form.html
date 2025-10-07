@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- <h1 class="mb-4">
+  {% if form.instance.pk %}Editar Material{% else %}Nuevo Material{% endif %}
+</h1> -->
+
+<div class="container mt-3 bg-light p-4 rounded shadow-sm">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h3>{% if form.instance.pk %}Editar Material{% else %}Nuevo Material{% endif %}</h3>
+      <form method="post" class="p-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="d-flex justify-content-between mt-4">
+          <button type="submit" class="btn btn-primary">
+            💾 Guardar
+          </button>
+          <a href="{% url 'material_list' %}" class="btn btn-secondary">
+            ❌ Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

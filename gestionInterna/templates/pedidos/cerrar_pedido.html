@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3 bg-light p-4 rounded shadow-sm">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h3>Cerrar pedido #{{ pedido.id }}</h3>
+
+      <p><strong>Cliente:</strong> {{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}</p>
+      <p><strong>Estado actual:</strong> {{ pedido.estado }}</p>
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!-- <button type="submit">Confirmar cierre</button> -->
+          <a href="{% url 'buscar_pedido_por_dni' %}" class="btn btn-secondary">
+            ⬅️Volver
+          </a>
+          <button type="submit" class="btn btn-primary">
+            💾 Confirmar cierre
+          </button>
+      </form>
+
+      <!-- <a href="{% url 'buscar_pedido_por_dni' %}">Volver</a> -->
+
+    </div>
+  </div>
+</div>
+{% endblock %}

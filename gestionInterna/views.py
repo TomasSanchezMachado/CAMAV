@@ -10,7 +10,9 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
 from django.http import HttpResponse
-from .models import Cliente , Pedido, Operario, Amortiguador, Fichaamortiguador, Tarea, Observacion, Material, MaterialFichaAmortiguador, MaterialTarea, Notificacion
+from .models import Cliente , Pedido, Operario, Amortiguador, Fichaamortiguador, Tarea, Observacion, Material, MaterialFichaAmortiguador, MaterialTarea, Notificacion, MovimientoStock
+from .forms import MaterialForm, StockUpdateForm, BuscarPedidoForm, CerrarPedidoForm
+from django.utils import timezone
 
 def login_view(request):
     if request.method == 'POST':
@@ -430,3 +432,122 @@ def emitir_comprobante(request, pedido_id):
             pedido.save()
             mensaje = 'Comprobante enviado al cliente.'
     return render(request, 'comprobante_pedido.html', {'pedido': pedido, 'tareas': tareas, 'mensaje': mensaje})
+
+def materiales_list(request):
+    materiales = Material.objects.all()
+    
+    for m in materiales:
+        m.stockRiesgo = int(m.stockMinimo * 1.1)
+    
+    return render(request, 'materiales/material_list.html', {'materials': materiales})   
+
+def material_detail(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    return render(request, 'materiales/material_detail.html', {'material': material})
+
+def material_create(request):
+    if request.method == 'POST':
+        form = MaterialForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('material_list')
+    else:
+        form = MaterialForm()
+    return render(request, 'materiales/material_form.html', {'form': form})
+
+def material_update(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    if request.method == 'POST':
+        form = MaterialForm(request.POST, instance=material)
+        if form.is_valid():
+            form.save()
+            return redirect('material_list')
+    else:
+        form = MaterialForm(instance=material)
+    return render(request, 'materiales/material_form.html', {'form': form})
+
+def material_delete(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    if request.method == 'POST':
+        material.delete()
+        return redirect('material_list')
+    return render(request, 'materiales/material_confirm_delete.html', {'material': material})
+
+def stock_update(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+
+    if request.method == 'POST':
+        form = StockUpdateForm(request.POST, material=material)
+        if form.is_valid():
+            stock_ingresado = form.cleaned_data['stock_ingresado']
+            proveedor = form.cleaned_data['proveedor']
+            fecha = form.cleaned_data['fecha']
+            observacion = form.cleaned_data['observacion']
+
+            MovimientoStock.objects.create(
+                material=material,
+                fecha=fecha,
+                cantidad=stock_ingresado,
+                proveedor=proveedor,
+                observacion=observacion
+            )
+
+            material.stockActual += stock_ingresado
+            material.save()
+
+            return redirect('material_list')
+    else:
+        form = StockUpdateForm(material=material)
+
+    return render(request, 'materiales/stock_update.html', {'form': form, 'material': material})
+
+def movimientos_list(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    movimientos = MovimientoStock.objects.filter(material=material).order_by('-fecha')
+
+    return render(request, 'materiales/movimientos_list.html', {
+        'material': material,
+        'movimientos': movimientos
+    })
+
+def buscar_pedido_por_dni(request):
+    pedido = None
+    cliente = None
+    error = None
+
+    if request.method == 'POST':
+        form = BuscarPedidoForm(request.POST)
+        if form.is_valid():
+            dni = form.cleaned_data['dni']
+            try:
+                cliente = Cliente.objects.get(dni=dni)
+                pedido = Pedido.objects.filter(cliente=cliente, estado='Listo para retirar').first()
+                if not pedido:
+                    error = "No hay pedidos listos para retirar para este cliente."
+            except Cliente.DoesNotExist:
+                error = "No se encontró un cliente con ese DNI."
+    else:
+        form = BuscarPedidoForm()
+
+    return render(request, 'pedidos/buscar_pedido.html', {
+        'form': form,
+        'pedido': pedido,
+        'cliente': cliente,
+        'error': error
+    })
+
+
+def cerrar_pedido(request, pk):
+    pedido = get_object_or_404(Pedido, pk=pk, estado='Listo para retirar')
+
+    if request.method == 'POST':
+        form = CerrarPedidoForm(request.POST)
+        if form.is_valid():
+            pedido.estado = 'Retirado'
+            pedido.fechaSalidaReal = timezone.now().date()
+            pedido.save()
+            return render(request, 'pedidos/cerrar_exito.html', {'pedido': pedido})
+    else:
+        form = CerrarPedidoForm()
+
+    return render(request, 'pedidos/cerrar_pedido.html', {'form': form, 'pedido': pedido})
