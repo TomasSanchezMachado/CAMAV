@@ -343,7 +343,11 @@ def finalizar_reparacion(request, tarea_id):
                 materiales=f"Finalización: Pedido {pedido.id} finalizado. Todas las tareas terminadas.",
                 resolved=False
             )
+        # Agregar mensaje de éxito y redirigir a la lista
+        messages.success(request, f'Tarea {tarea.id} finalizada correctamente.')
         return redirect('tareas_en_reparacion')
+
+    # Si no es POST, mostrar formulario para completar orden de trabajo y observación
     return render(request, 'finalizar_reparacion.html', {'tarea': tarea, 'mensaje': mensaje})
 
 

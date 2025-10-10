@@ -27,7 +27,7 @@
   <form method="post">
     {% csrf_token %}
     <button type="submit" name="accion" value="emitir" class="btn btn-success">Emitir comprobante PDF</button>
-    <button type="submit" name="accion" value="enviar" class="btn btn-primary">Enviar comprobante al cliente</button>
+    <!-- <button type="submit" name="accion" value="enviar" class="btn btn-primary">Enviar comprobante al cliente</button> -->
   </form>
   {% if mensaje %}
     <div class="alert alert-info mt-3">{{ mensaje }}</div>
