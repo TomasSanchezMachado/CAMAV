@@ -32,8 +32,23 @@ urlpatterns = [
     path('historial_amortiguador/<int:amortiguador_id>/', views.historial_amortiguador, name='historial_amortiguador'),
     path('tareas_en_reparacion/', views.tareas_en_reparacion, name='tareas_en_reparacion'),
     path('finalizar_reparacion/<int:tarea_id>/', views.finalizar_reparacion, name='finalizar_reparacion'),
-    path('estado_operarios/', views.lista_operarios, name='estado_operarios'),
     path('pedidos_terminados/', views.pedidos_terminados, name='pedidos_terminados'),
     path('emitir_comprobante/<int:pedido_id>/', views.emitir_comprobante, name='emitir_comprobante'),
+    path("crear_operario/", views.crear_operario, name="operarios_create"),
+    path('operarios/', views.lista_operarios, name='estado_operarios'),
+    path("operarios/eliminar/", views.eliminar_operarios, name="operarios_delete"),
+    path("operarios/actualizar/", views.actualizar_operarios, name="operarios_update"),
+        #MATERIALES
+    path('materiales/', views.materiales_list, name='material_list'),
+    path('material/<int:pk>/', views.material_detail, name='material_detail'),
+    path('material/new/', views.material_create, name='material_create'),
+    path('material/<int:pk>/edit/', views.material_update, name='material_update'),
+    path('material/<int:pk>/delete/', views.material_delete, name='material_delete'),
+    path('material/<int:pk>/stock/', views.stock_update, name='stock_update'),
+    path('material/<int:pk>/movimientos/', views.movimientos_list, name='movimientos_list'),
+    path('material/reporte/', views.material_reporte, name='material_reporte'),
+    ##PEDIDOS
+    path('pedidos/cerrar/', views.buscar_pedido_por_dni, name='buscar_pedido_por_dni'),
+    path('pedidos/<int:pk>/cerrar/', views.cerrar_pedido, name='cerrar_pedido'),
 ]
 

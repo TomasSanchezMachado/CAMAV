@@ -38,7 +38,10 @@
               <a class="nav-link" href="/tareas_en_reparacion">Tareas en reparación</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/estado_operarios">Tareas en reparación</a>
+              <a class="nav-link" href="/operarios">Operarios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/materiales' in request.path %}active{% endif %}" href="/materiales">Materiales</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/pedidos_terminados">Pedidos terminados</a>

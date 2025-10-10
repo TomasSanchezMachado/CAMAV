@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3 bg-light p-4 rounded">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h2>Lista de Materiales</h2>
+        <!-- <a href="{% url 'material_create' %}">➕ Nuevo Material</a> -->
+        <table border="1" cellpadding="5">
+        <tr>
+            <th>Nombre</th><th>Tipo</th><th>Unidad</th><th>Stock</th><th>Acciones</th>
+        </tr>
+        {% for m in materials %}
+        <tr
+        {% if m.stockActual <= m.stockMinimo %}
+            style="background-color:#ffcccc;"   {# Rojo #}
+        {% elif m.stockActual <= m.stockRiesgo %}
+            style="background-color:#fff3b0;"   {# Amarillo #}
+        {% else %}
+            style="background-color:#d4edda;"   {# Verde #}
+        {% endif %}
+        >
+            <td><a href="{% url 'material_detail' m.pk %}">{{ m.nombre }}</a></td>
+            <td>{{ m.tipo }}</td>
+            <td>{{ m.unidad }}</td>
+            <td>{{ m.stockActual }}</td>
+            <td>
+                <a href="{% url 'material_update' m.pk %}">Editar</a> |
+                <a href="{% url 'stock_update' m.pk %}">Actualizar Stock</a> |
+                <a href="{% url 'material_delete' m.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </table>
+    </br>   
+    <a href="{% url 'material_create' %}" class="btn btn-primary">
+        ➕ Nuevo Material
+    </a>
+    <a href="{% url 'material_reporte' %}?tipo=urgente" class="btn btn-success ms-2">
+        📄 Generar Reporte
+    </a>
+  </div>
+</div>
+{% endblock %}

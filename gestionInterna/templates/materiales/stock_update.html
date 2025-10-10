@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3 bg-light p-4 rounded">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h3>Ingreso de stock: {{ material.nombre }}</h3>
+        <a href="{% url 'movimientos_list' material.pk %}" class="btn btn-info">
+            Ver historial de movimientos
+        </a>
+      <form method="post">
+        {% csrf_token %}
+
+<!--         <div class="mb-3">
+          <label>Stock actual:</label>
+          <input type="number" class="form-control" value="{{ material.stockActual }}" readonly>
+        </div> -->
+
+        {{ form.as_p }}
+
+        <div class="d-flex justify-content-between mt-4">
+          <button type="submit" class="btn btn-success">
+            ➕ Ingresar Stock
+          </button>
+          <a href="{% url 'material_list' %}" class="btn btn-secondary">
+            ⬅️ Volver
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

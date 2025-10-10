@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3 bg-light p-4 rounded">
+  <h3>Historial de movimientos - {{ material.nombre }}</h3>
+
+  {% if movimientos %}
+    <table class="table table-striped mt-3">
+      <thead class="table-secondary">
+        <tr>
+          <th>Fecha</th>
+          <th>Cantidad</th>
+          <th>Proveedor</th>
+          <th>Observación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mov in movimientos %}
+        <tr>
+          <td>{{ mov.fecha|date:"d/m/Y" }}</td>
+          <td>+{{ mov.cantidad }}</td>
+          <td>{{ mov.proveedor }}</td>
+          <td>{{ mov.observacion }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="mt-3 text-muted">No hay movimientos registrados aún.</p>
+  {% endif %}
+
+  <div class="mt-4">
+    <a href="{% url 'stock_update' material.pk %}" class="btn btn-secondary">⬅️ Volver</a>
+  </div>
+</div>
+{% endblock %}

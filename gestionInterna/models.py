@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Cliente(models.Model):
@@ -58,11 +59,22 @@ class Observacion (models.Model):
   valordiagrama = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
 class Material(models.Model):
+  nombre = models.CharField(max_length=200, default='')
   tipo = models.CharField(max_length=100)
-  stockActual = models.BigIntegerField()
-  stockMinimo = models.BigIntegerField()
-  # stockreservado default 0 to avoid None checks and simplify logic
-  stockreservado = models.BigIntegerField(default=0)
+  unidad = models.CharField(max_length=100, default='unidad')
+  stockActual = models.BigIntegerField(default=0)
+  stockMinimo = models.BigIntegerField(default=0)
+  stockreservado = models.BigIntegerField(blank=True, null=True, default=0)
+
+class MovimientoStock(models.Model):
+    material = models.ForeignKey('Material', on_delete=models.CASCADE)
+    fecha = models.DateField(default=timezone.now)
+    cantidad = models.BigIntegerField()
+    proveedor = models.CharField(max_length=200, blank=True)
+    observacion = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.material.nombre} (+{self.cantidad})"
 
 class MaterialTarea(models.Model):
   material = models.ForeignKey(Material, on_delete=models.CASCADE)
