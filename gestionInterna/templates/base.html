@@ -39,10 +39,10 @@
                   <a class="nav-link" href="{% url 'pedidos_terminados' %}">Pedidos terminados</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'estado_operarios' %}">Operarios</a>
+                  <a class="nav-link" href="{% url 'buscar_pedido_por_dni' %}">Cerrar Pedido</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'material_list' %}">Materiales</a>
+                  <a class="nav-link" href="{% url 'estado_operarios' %}">Operarios</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'fichaamortiguador_list' %}">Fichas de Amortiguador</a>
@@ -50,9 +50,7 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'cliente_list' %}">Clientes</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'buscar_pedido_por_dni' %}">Cerrar Pedido</a>
-                </li>
+                
 
               {% elif request.user.operario.role == 'operario' %}
                 <li class="nav-item">
@@ -60,6 +58,10 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'tareas_en_reparacion' %}">Tareas en reparación</a>
+                </li>
+              {% elif request.user.operario.role == 'encargado_materiales' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'material_list' %}">Materiales</a>
                 </li>
               {% endif %}
               <li class="nav-item">
