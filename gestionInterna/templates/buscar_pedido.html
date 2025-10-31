@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-3 bg-light p-4 rounded shadow-sm">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h3>Cerrar pedido - Buscar por DNI</h3>
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!-- <button type="submit">Buscar pedido</button> -->
+        <button type="submit" class="btn btn-primary">
+          🔍 Buscar pedido
+         </button>
+      </form>
+
+      {% if error %}
+        <p style="color:red;">{{ error }}</p>
+      {% endif %}
+
+      {% if pedido %}
+        <hr>
+        <h3>Pedido encontrado</h3>
+        <p><strong>Cliente:</strong> {{ cliente.nombre }} {{ cliente.apellido }}</p>
+        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+        <p><strong>Fecha ingreso:</strong> {{ pedido.fechaingreso }}</p>
+
+        <a href="{% url 'cerrar_pedido' pedido.id %}" class="btn btn-primary">
+            ✅ Cerrar pedido
+        </a>
+
+        <!-- <a href="">Cerrar pedido</a> -->
+
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

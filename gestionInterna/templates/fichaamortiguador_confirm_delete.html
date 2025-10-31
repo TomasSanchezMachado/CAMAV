@@ -1,0 +1,17 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Eliminar ficha de amortiguador</h2>
+  <div class="card p-4">
+    <p>
+      ¿Estás seguro que quieres eliminar la ficha "{{ ficha.nombregenerico }}"?
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <a href="{% url 'fichaamortiguador_list' %}" class="btn btn-secondary"
+        >Cancelar</a
+      >
+      <button type="submit" class="btn btn-danger">Eliminar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

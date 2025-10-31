@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Gestión de Fichas de Amortiguador</h2>
+
+  <div class="d-flex align-items-center mb-4">
+    <form method="get" class="d-flex flex-grow-1" style="max-width: 50%">
+      <div class="input-group w-100">
+        <input
+          type="text"
+          name="q"
+          class="form-control"
+          placeholder="Buscar por nombre o serie..."
+          value="{{ query }}"
+        />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+      </div>
+    </form>
+    <div class="d-flex ms-3 gap-2">
+      <a href="{% url 'fichaamortiguador_create' %}" class="btn btn-success"
+        >Agregar</a
+      >
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre Genérico</th>
+          <th>Número de Serie Genérico</th>
+          <th>Valor Mínimo</th>
+          <th>Valor Máximo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ficha in fichas %}
+        <tr>
+          <td>{{ ficha.id }}</td>
+          <td>{{ ficha.nombregenerico }}</td>
+          <td>{{ ficha.nroseriegenerico }}</td>
+          <td>{{ ficha.valor_minimo }}</td>
+          <td>{{ ficha.valor_maximo }}</td>
+          <td>
+            <a
+              href="{% url 'fichaamortiguador_edit' ficha.id %}"
+              class="btn btn-sm btn-warning"
+              >Editar</a
+            >
+            <form
+              method="post"
+              action="{% url 'fichaamortiguador_delete' ficha.id %}"
+              style="display: inline"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">
+                Eliminar
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

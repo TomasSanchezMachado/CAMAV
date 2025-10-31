@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Cliente(models.Model):
@@ -24,6 +25,13 @@ class Operario(models.Model):
   apellido = models.CharField(max_length=200)
   estado =models.CharField(max_length=200)
   password = models.CharField(max_length=200)
+  # link to Django User (optional)
+  user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE, related_name='operario')
+  ROLE_CHOICES = (
+    ('operario', 'Operario'),
+    ('encargado', 'Encargado'),
+  )
+  role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='operario')
 
 class Fichaamortiguador (models.Model):
   nombregenerico = models.CharField(max_length=100)

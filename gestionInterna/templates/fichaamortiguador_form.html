@@ -1,0 +1,278 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">
+    {% if ficha %}Editar ficha{% else %}Crear ficha{% endif %}
+  </h2>
+
+  <form method="post" class="card p-4 shadow-sm">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Nombre genérico</label>
+      <input
+        type="text"
+        name="nombregenerico"
+        class="form-control"
+        value="{{ ficha.nombregenerico|default_if_none:'' }}"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Número de serie genérico</label>
+      <input
+        type="text"
+        name="nroseriegenerico"
+        class="form-control"
+        value="{{ ficha.nroseriegenerico|default_if_none:'' }}"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Valor mínimo</label>
+      <input
+        type="number"
+        step="0.01"
+        name="valor_minimo"
+        class="form-control"
+        value="{{ ficha.valor_minimo|default_if_none:0 }}"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Valor máximo</label>
+      <input
+        type="number"
+        step="0.01"
+        name="valor_maximo"
+        class="form-control"
+        value="{{ ficha.valor_maximo|default_if_none:0 }}"
+      />
+    </div>
+
+    <!-- Sección: materiales recomendados para esta ficha -->
+    <div class="mb-3">
+      <label class="form-label">Materiales recomendados</label>
+      <div id="materials-rows">
+        {% if materials %}
+          {% for m in materials %}
+            <div class="row mb-2 material-row">
+              <div class="col-5">
+                <select name="material_id" class="form-select material-select">
+                  <option value="">-- Seleccionar material --</option>
+                  {% for mat in materials_all %}
+                    <option value="{{ mat.id }}" {% if mat.nombre == m.nombre %}selected{% endif %}>{{ mat.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col">
+                <input type="text" name="material_name" class="form-control" placeholder="O escribir nuevo material" value="{{ m.nombre }}" />
+              </div>
+              <div class="col-2">
+                <input type="number" name="material_cantidad" class="form-control" placeholder="Cant." value="{{ m.cantidad }}" />
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-danger btn-remove">Eliminar</button>
+                <button type="button" class="btn btn-sm btn-outline-primary btn-create" title="Crear material detallado">Crear material</button>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="row mb-2 material-row">
+            <div class="col-5">
+              <select name="material_id" class="form-select material-select">
+                <option value="">-- Seleccionar material --</option>
+                {% for mat in materials_all %}
+                  <option value="{{ mat.id }}">{{ mat.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col">
+              <input type="text" name="material_name" class="form-control" placeholder="O escribir nuevo material" />
+            </div>
+            <div class="col-2">
+              <input type="number" name="material_cantidad" class="form-control" placeholder="Cant." />
+            </div>
+            <div class="col-auto d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-danger btn-remove">Eliminar</button>
+              <button type="button" class="btn btn-sm btn-outline-primary btn-create" title="Crear material detallado">Crear material</button>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      <button
+        type="button"
+        id="add-material"
+        class="btn btn-sm btn-outline-primary mt-2"
+      >
+        Agregar material
+      </button>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <a href="{% url 'fichaamortiguador_list' %}" class="btn btn-secondary"
+        >Cancelar</a
+      >
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ materials_all|json_script:"materials-data" }}
+<script>
+  (function(){
+    // materials data exposed as JSON to avoid template-in-js parsing issues
+    const materialsAll = JSON.parse(document.getElementById('materials-data') ? document.getElementById('materials-data').textContent : '[]');
+    const container = document.getElementById('materials-rows');
+    const addBtn = document.getElementById('add-material');
+
+    function makeRow(name = '', cantidad = ''){
+      const div = document.createElement('div');
+      div.className = 'row mb-2 material-row';
+      let options = '<option value="">-- Seleccionar material --</option>';
+      materialsAll.forEach(m=>{ options += `<option value="${m.id}">${m.nombre}</option>`; });
+
+      div.innerHTML = `
+        <div class="col-5">
+          <select name="material_id" class="form-select material-select">${options}</select>
+        </div>
+        <div class="col">
+          <input type="text" name="material_name" class="form-control" placeholder="O escribir nuevo material" value="${name}" />
+        </div>
+        <div class="col-2">
+          <input type="number" name="material_cantidad" class="form-control" placeholder="Cant." value="${cantidad}" />
+        </div>
+        <div class="col-auto d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-danger btn-remove">Eliminar</button>
+          <button type="button" class="btn btn-sm btn-outline-primary btn-create" title="Crear material detallado">Crear material</button>
+        </div>
+      `;
+      return div;
+    }
+
+    // Delegated handler for remove and create
+    container.addEventListener('click', function(e){
+      if(e.target && e.target.classList.contains('btn-remove')){
+        const row = e.target.closest('.material-row');
+        if(row) row.remove();
+      } else if(e.target && e.target.classList.contains('btn-create')){
+        const row = e.target.closest('.material-row');
+        if(!row) return;
+        const nameInput = row.querySelector('input[name="material_name"]');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const next = window.location.href;
+        // open material create page with next and name prefilled
+        const url = new URL("{% url 'material_create' %}", window.location.origin);
+        url.searchParams.set('next', next);
+        if(name) url.searchParams.set('name', name);
+        window.location.href = url.toString();
+      }
+    });
+
+    addBtn.addEventListener('click', function(){
+      const r = makeRow();
+      container.appendChild(r);
+      // initialize select2 on the newly added select
+      if (window.jQuery && jQuery().select2) {
+        jQuery(r).find('.material-select').select2({tags:true, width: '100%', placeholder: '-- Seleccionar material --'});
+      }
+    });
+
+    // initialize existing selects with Select2 (if available)
+    if (window.jQuery && jQuery().select2) {
+      jQuery(document).ready(function(){
+        jQuery('.material-select').select2({tags:true, width: '100%', placeholder: '-- Seleccionar material --'});
+      });
+    }
+  })();
+</script>
+<!-- Modal for creating material -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear material</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="materialModalBody">
+        <!-- form fragment will be loaded here -->
+        <div class="text-center">Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      if (match) return decodeURIComponent(match[2]);
+      return null;
+    }
+
+    const materialModal = new bootstrap.Modal(document.getElementById('materialModal'));
+    const modalBody = document.getElementById('materialModalBody');
+
+    // Delegated handler to open modal and load form fragment
+    document.getElementById('materials-rows').addEventListener('click', async function(e){
+      if(e.target && e.target.classList.contains('btn-create')){
+        const row = e.target.closest('.material-row');
+        const nameInput = row.querySelector('input[name="material_name"]');
+        const name = nameInput ? nameInput.value.trim() : '';
+        // fetch fragment
+        const url = new URL('{% url "material_create_ajax" %}', window.location.origin);
+        if(name) url.searchParams.set('name', name);
+        modalBody.innerHTML = '<div class="text-center">Cargando...</div>';
+        materialModal.show();
+        try{
+          const resp = await fetch(url.toString(), {credentials: 'same-origin'});
+          const data = await resp.json();
+          if(data.ok){
+            modalBody.innerHTML = data.html;
+            // attach submit handler for fragment form
+            const form = modalBody.querySelector('#material-fragment-form');
+            if(form){
+              form.addEventListener('submit', async function(ev){
+                ev.preventDefault();
+                const formData = new FormData(form);
+                const postUrl = '{% url "material_create_ajax" %}';
+                const postResp = await fetch(postUrl, {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                  body: formData
+                });
+                const postData = await postResp.json();
+                if(postData.ok){
+                  // add new option to all selects and select it in this row
+                  const newId = postData.id;
+                  const newName = postData.nombre;
+                  document.querySelectorAll('.material-select').forEach(function(sel){
+                    const opt = document.createElement('option');
+                    opt.value = String(newId);
+                    opt.text = newName;
+                    sel.appendChild(opt);
+                  });
+                  // set the select in this row to the new value
+                  const selInRow = row.querySelector('.material-select');
+                  if(selInRow){ selInRow.value = String(newId); if(window.jQuery && jQuery().trigger){ jQuery(selInRow).trigger('change'); } }
+                  // also set the text input value
+                  if(nameInput) nameInput.value = newName;
+                  materialModal.hide();
+                } else {
+                  // show returned fragment (with errors)
+                  if(postData.html) modalBody.innerHTML = postData.html;
+                }
+              });
+            }
+          }
+        } catch(err){
+          modalBody.innerHTML = '<div class="alert alert-danger">Error cargando el formulario.</div>';
+        }
+      }
+    });
+  })();
+</script>
+{% endblock %}

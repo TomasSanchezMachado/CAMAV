@@ -16,43 +16,75 @@
     <title>camav</title>
   </head>
   <body>
-    {% if request.path != '/login/' %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid d-flex justify-content-between ">
-        <a class="navbar-brand" href="/">🛠️ Camav</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCamav" aria-controls="navbarCamav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse " id="navbarCamav">
-          <ul class="navbar-nav ms-auto d-flex gap-3">
-            <li class="nav-item">
-              <a class="nav-link active" href="/">Inicio</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/createpedido">Crear pedido</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/paneltareas">Panel de tareas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/tareas_en_reparacion">Tareas en reparación</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/operarios">Operarios</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link {% if '/materiales' in request.path %}active{% endif %}" href="/materiales">Materiales</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/pedidos_terminados">Pedidos terminados</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/listapedidosrevisados">Pedidos revisados</a>
-            </li>
-          </ul>
+    {% if request.user.is_authenticated %}
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid d-flex justify-content-between ">
+          <a class="navbar-brand" href="{% url 'home' %}">🛠️ Camav</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCamav" aria-controls="navbarCamav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse " id="navbarCamav">
+            <ul class="navbar-nav ms-auto d-flex gap-3">
+              {% if request.user.operario.role == 'encargado' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'createpedido' %}">Crear pedido</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'listapedidosrevisados' %}">Pedidos revisados</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'pedidos_terminados' %}">Pedidos terminados</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'estado_operarios' %}">Operarios</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'material_list' %}">Materiales</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'fichaamortiguador_list' %}">Fichas de Amortiguador</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'cliente_list' %}">Clientes</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'buscar_pedido_por_dni' %}">Cerrar Pedido</a>
+                </li>
+
+              {% elif request.user.operario.role == 'operario' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'paneltareas' %}">Panel de tareas</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'tareas_en_reparacion' %}">Tareas en reparación</a>
+                </li>
+              {% endif %}
+              <li class="nav-item">
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link nav-link" style="padding: 0; color: inherit;">Cerrar sesión</button>
+                </form>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    {% else %}
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid d-flex justify-content-between">
+          <a class="navbar-brand" href="/">🛠️ Camav</a>
+          <div class="collapse navbar-collapse" id="navbarCamav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/login">Iniciar sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     {% endif %}
     {% block content %} {% endblock %}
 

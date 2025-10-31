@@ -109,7 +109,7 @@
       {% if materialxtarea %}
       <div class="card mb-3">
         <div class="card-body">
-          <h6 class="card-title">Materiales Usados en la Tarea</h6>
+          <h6 class="card-title">Materiales para usar en la Tarea</h6>
           <div class="table-responsive">
             <table class="table table-sm table-bordered">
               <thead class="table-light">
@@ -131,8 +131,23 @@
 
           <form action="" method="post" class="mt-2 d-flex justify-content-end">
             {% csrf_token %}
-            <button type="submit" name="accion" value="reservar_materiales" class="btn btn-success">Reservar materiales</button>
+            {% if not can_reserve %}
+              <button type="submit" name="accion" value="reservar_materiales" class="btn btn-success" disabled>Reservar materiales</button>
+            {% else %}
+              <button type="submit" name="accion" value="reservar_materiales" class="btn btn-success">Reservar materiales</button>
+            {% endif %}
           </form>
+          {% if not can_reserve and missing_materials %}
+            <div class="alert alert-warning mt-2">
+              <strong>Faltan materiales:</strong>
+              <ul class="mb-0">
+                {% for m in missing_materials %}
+                  <li>{{ m.nombre }} — requerido: {{ m.required }}, disponible: {{ m.available }}</li>
+                {% endfor %}
+              </ul>
+              <div class="small text-muted">Se ha generado una notificación para el encargado.</div>
+            </div>
+          {% endif %}
         </div>
       </div>
       {% endif %}

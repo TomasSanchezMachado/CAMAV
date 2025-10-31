@@ -1,0 +1,95 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Gestión de Clientes</h2>
+
+  <div class="d-flex align-items-center mb-4">
+    <form method="get" class="d-flex flex-grow-1" style="max-width: 50%">
+      <div class="input-group w-100">
+        <input
+          type="text"
+          name="q"
+          class="form-control"
+          placeholder="Buscar por nombre, apellido o DNI..."
+          value="{{ query }}"
+        />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+      </div>
+    </form>
+    <div class="d-flex ms-3 gap-2">
+      <a href="{% url 'cliente_create' %}" class="btn btn-success">Agregar</a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in clientes %}
+        <tr>
+          <td>{{ cliente.id }}</td>
+          <td>{{ cliente.nombre }}</td>
+          <td>{{ cliente.apellido }}</td>
+          <td>{{ cliente.dni }}</td>
+          <td>{{ cliente.telefono }}</td>
+          <td>{{ cliente.correo }}</td>
+          <td>
+            <a
+              href="{% url 'cliente_edit' cliente.id %}"
+              class="btn btn-sm btn-warning"
+              >Editar</a
+            >
+            <form
+              method="post"
+              action="{% url 'cliente_delete' cliente.id %}"
+              style="display: inline"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">
+                Eliminar
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if cliente_pedidos %}
+<div class="mt-5">
+  <h3>Pedidos del Cliente</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha de Ingreso</th>
+        <th>Estado</th>
+        <th>Fecha de Salida Estimada</th>
+        <th>Fecha de Salida Real</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pedido in cliente_pedidos %}
+      <tr>
+        <td>{{ pedido.id }}</td>
+        <td>{{ pedido.fechaingreso }}</td>
+        <td>{{ pedido.estado }}</td>
+        <td>{{ pedido.fechaSalidaEstimada }}</td>
+        <td>{{ pedido.fechaSalidaReal }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %} {% endblock %}
